@@ -5,6 +5,11 @@ body {
   overflow-x: hidden;
 }
 
+/* Godot canvas background fix */
+canvas {
+  background: transparent !important;
+}
+
 /* Animated gradient background */
 .gradient-bg {
   background: linear-gradient(135deg, #0f172a 0%, #1c1917 50%, #0f172a 100%);

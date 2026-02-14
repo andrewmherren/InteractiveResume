@@ -24,3 +24,5 @@ dist-ssr
 *.sw?
 
 RESUME_SCRATCHPAD.md
+Export/
+public/teaser/
