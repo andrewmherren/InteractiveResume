@@ -250,21 +250,31 @@ function GodotTeaser() {
             document.body.appendChild(loaderScript)
         }
 
-        // Load Godot engine script AFTER loader is ready
-        if (!existingEngineScript) {
-            const engineScript = document.createElement('script')
-            engineScript.src = '/teaser/ResumeTeaser.js'
-            engineScript.async = true
-            engineScript.dataset.godotTeaser = 'engine'
+        // Wait for hero typing to complete first phrase, then load during the pause
+        const handleTypingComplete = () => {
+            console.log('[GodotTeaser] Hero typing complete - loading Godot during pause')
+            // Load Godot engine script during the typing pause
+            if (!existingEngineScript && !document.querySelector('script[data-godot-teaser="engine"]')) {
+                const engineScript = document.createElement('script')
+                engineScript.src = '/teaser/ResumeTeaser.js'
+                engineScript.async = true
+                engineScript.dataset.godotTeaser = 'engine'
 
-            engineScript.onload = () => {
-                // Initialize Godot
-                if (globalThis.initGodotTeaser) {
-                    globalThis.initGodotTeaser()
+                engineScript.onload = () => {
+                    // Initialize Godot
+                    if (globalThis.initGodotTeaser) {
+                        globalThis.initGodotTeaser()
+                    }
                 }
-            }
 
-            document.body.appendChild(engineScript)
+                document.body.appendChild(engineScript)
+            }
+        }
+
+        window.addEventListener('hero-typing-complete', handleTypingComplete)
+
+        return () => {
+            window.removeEventListener('hero-typing-complete', handleTypingComplete)
         }
     }, [])
 

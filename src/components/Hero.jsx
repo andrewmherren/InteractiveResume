@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const Hero = () => {
     const roles = [
@@ -9,41 +9,62 @@ const Hero = () => {
         "From MVP to enterprise product"
     ];
 
+    const textRef = useRef(null);
     const [currentRole, setCurrentRole] = useState(0);
-    const [displayText, setDisplayText] = useState('');
-    const [isDeleting, setIsDeleting] = useState(false);
+    const displayText = useRef('');
+    const isDeleting = useRef(false);
+    const hasSignaledGodotLoad = useRef(false);
 
-    // Typing effect
+    // Typing effect using direct DOM manipulation for smoothness
     useEffect(() => {
-        const role = roles[currentRole];
-        const timeout = setTimeout(() => {
-            if (isDeleting) {
-                if (displayText.length > 0) {
+        let timeoutId;
+
+        const type = () => {
+            const role = roles[currentRole];
+
+            if (isDeleting.current) {
+                if (displayText.current.length > 0) {
                     // delete a character
-                    setDisplayText(displayText.slice(0, -1));
+                    displayText.current = displayText.current.slice(0, -1);
+                    if (textRef.current) {
+                        textRef.current.textContent = displayText.current;
+                    }
+                    timeoutId = setTimeout(type, 30);
                 } else {
-                    // everything deleted, switch back to not deleting
-                    // and choose new role
-                    setIsDeleting(false);
+                    // everything deleted, switch to next role
+                    isDeleting.current = false;
                     setCurrentRole((prev) => (prev + 1) % roles.length);
+                    timeoutId = setTimeout(type, 100);
                 }
             } else {
-                if (displayText.length < role.length) {
+                if (displayText.current.length < role.length) {
                     // add a character
-                    setDisplayText(role.slice(0, displayText.length + 1));
+                    displayText.current = role.slice(0, displayText.current.length + 1);
+                    if (textRef.current) {
+                        textRef.current.textContent = displayText.current;
+                    }
+                    timeoutId = setTimeout(type, 80);
                 } else {
+                    // finished typing first phrase - signal Godot to load during the pause
+                    if (!hasSignaledGodotLoad.current) {
+                        hasSignaledGodotLoad.current = true;
+                        window.dispatchEvent(new CustomEvent('hero-typing-complete'));
+                        console.log('[Hero] First phrase complete - signaling Godot load');
+                    }
                     // finished typing, start deleting after a pause
-                    setTimeout(() => setIsDeleting(true), 2000);
+                    isDeleting.current = true;
+                    timeoutId = setTimeout(type, 2000);
                 }
             }
-        }, isDeleting ? 30 : 80);
+        };
 
-        // cleanup timer
-        return () => clearTimeout(timeout);
+        timeoutId = setTimeout(type, 100);
+
+        return () => clearTimeout(timeoutId);
     }, [displayText, isDeleting, currentRole]);
 
     return (
-        <div className="relative z-10 max-w-3xl mx-auto">
+        <div className="relative z-10 w-full max-w-3xl mx-auto">
             <div className="stagger-children">
                 <div className="mb-8 flex justify-center">
                     <div className="w-28 h-28 md:w-36 md:h-36 rounded-full overflow-hidden border-4 border-amber-500/50 glow">
@@ -65,12 +86,12 @@ const Hero = () => {
 
                 <div className="h-16 md:h-20 flex items-center justify-center mb-8">
                     <p className="text-xl md:text-3xl text-slate-300 text-center">
-                        {displayText}
+                        <span ref={textRef}></span>
                         <span className="typing-cursor" />
                     </p>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4 mb-10 max-w-2xl mx-auto lg:mx-0">
+                <div className="grid grid-cols-3 gap-4 mb-10 w-full max-w-2xl mx-auto px-12 md:px-18">
                     <div className="glass rounded-xl p-4 text-center hover-lift cursor-pointer" onClick={() => document.getElementById('experience').scrollIntoView({ behavior: 'smooth' })}>
                         <div className="text-3xl md:text-4xl font-bold gradient-text">18+</div>
                         <div className="text-xs md:text-sm text-slate-400">Years Experience</div>
