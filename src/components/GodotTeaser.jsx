@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 
-function GodotTeaser() {
+function GodotTeaser({ themeClass = 'theme-teal-gold' }) {
     const containerRef = useRef(null)
     const [scale, setScale] = useState(1)
+    const [isReady, setIsReady] = useState(false)
 
     // Original game dimensions
     const GAME_WIDTH = 1080
@@ -95,18 +96,49 @@ function GodotTeaser() {
     }, [])
 
     useEffect(() => {
+        const handleReadyEvent = () => setIsReady(true)
+        window.addEventListener('godot-engine-ready', handleReadyEvent)
+
+        const markReadyIfStatusGone = () => {
+            const statusOverlay = document.getElementById('godot-status')
+            if (!statusOverlay) {
+                setIsReady(true)
+                return true
+            }
+            return false
+        }
+
+        if (markReadyIfStatusGone()) {
+            return () => window.removeEventListener('godot-engine-ready', handleReadyEvent)
+        }
+
+        const observer = new MutationObserver(() => {
+            if (markReadyIfStatusGone()) {
+                observer.disconnect()
+            }
+        })
+
+        observer.observe(document.body, { childList: true, subtree: true })
+
+        return () => {
+            window.removeEventListener('godot-engine-ready', handleReadyEvent)
+            observer.disconnect()
+        }
+    }, [])
+
+    useEffect(() => {
         const calculateScale = () => {
             if (!containerRef.current) return
 
             const containerWidth = containerRef.current.offsetWidth
-            const containerHeight = globalThis.innerHeight * 0.8 // Max 80% of viewport height
+            const containerHeight = globalThis.innerHeight * 0.6 // Max 60% of viewport height
 
             // Calculate scale to fit both width and height
             const scaleX = containerWidth / GAME_WIDTH
             const scaleY = containerHeight / GAME_HEIGHT
 
             // Use the smaller scale to ensure it fits
-            const newScale = Math.min(scaleX, scaleY, 1) // Don't scale up beyond 1
+            const newScale = Math.min(scaleX, scaleY, 0.65) // Max 65% scale
 
             setScale(newScale)
         }
@@ -166,43 +198,42 @@ function GodotTeaser() {
     const scaledHeight = GAME_HEIGHT * scale
 
     return (
-        <section className="w-full bg-slate-950 py-8 flex justify-center items-center">
-            <div
-                ref={containerRef}
-                className="w-full max-w-screen-xl px-4"
-            >
+        <div className={`teaser-container ${themeClass}`}>
+            <div ref={containerRef} className="w-full">
                 <div
-                    className="mx-auto relative overflow-hidden rounded-lg shadow-2xl bg-transparent"
+                    className="teaser-wrapper"
                     style={{
                         width: `${scaledWidth}px`,
                         height: `${scaledHeight}px`,
                     }}
                 >
-                    <div
-                        className="relative w-full h-full"
-                    >
-                        <canvas id="godot-canvas" width={GAME_WIDTH} height={GAME_HEIGHT}>
-                            Your browser does not support the canvas tag.
-                        </canvas>
+                    <img
+                        src="/teaser/ResumeTeaser.png"
+                        alt="Resume teaser preview"
+                        className={`teaser-poster ${isReady ? 'teaser-poster-hidden' : ''}`}
+                    />
 
-                        <noscript>
-                            Your browser does not support JavaScript.
-                        </noscript>
+                    <canvas id="godot-canvas" width={GAME_WIDTH} height={GAME_HEIGHT}>
+                        Your browser does not support the canvas tag.
+                    </canvas>
 
-                        <div id="godot-status">
-                            <img
-                                id="godot-status-splash"
-                                className="show-image--true fullsize--true use-filter--true"
-                                src="/teaser/ResumeTeaser.png"
-                                alt="Loading..."
-                            />
-                            <progress id="godot-status-progress"></progress>
-                            <div id="godot-status-notice"></div>
-                        </div>
+                    <noscript>
+                        Your browser does not support JavaScript.
+                    </noscript>
+
+                    <div id="godot-status">
+                        <img
+                            id="godot-status-splash"
+                            className="show-image--true fullsize--true use-filter--true"
+                            src="/teaser/ResumeTeaser.png"
+                            alt="Loading..."
+                        />
+                        <progress id="godot-status-progress"></progress>
+                        <div id="godot-status-notice"></div>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
     )
 }
 
