@@ -80,7 +80,7 @@ const ResumeTimeline = () => {
     };
 
     return (
-        <section className="py-20 px-4 relative">
+        <section className="py-10 md:py-12 px-4 relative">
             {/* Background decoration */}
             <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-amber-500/30 to-transparent hidden md:block" />
 

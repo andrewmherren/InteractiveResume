@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 
-function GodotTeaser({ themeClass = 'theme-teal-gold' }) {
+function GodotTeaser() {
     const containerRef = useRef(null)
     const [scale, setScale] = useState(1)
     const [isReady, setIsReady] = useState(false)
@@ -198,7 +198,7 @@ function GodotTeaser({ themeClass = 'theme-teal-gold' }) {
     const scaledHeight = GAME_HEIGHT * scale
 
     return (
-        <div className={`teaser-container ${themeClass}`}>
+        <div className="teaser-container">
             <div ref={containerRef} className="w-full">
                 <div
                     className="teaser-wrapper"
@@ -208,12 +208,17 @@ function GodotTeaser({ themeClass = 'theme-teal-gold' }) {
                     }}
                 >
                     <img
-                        src="/teaser/ResumeTeaser.png"
+                        src="/teaser/ResumeTeaser.webp"
                         alt="Resume teaser preview"
                         className={`teaser-poster ${isReady ? 'teaser-poster-hidden' : ''}`}
                     />
 
-                    <canvas id="godot-canvas" width={GAME_WIDTH} height={GAME_HEIGHT}>
+                    <canvas
+                        id="godot-canvas"
+                        width={GAME_WIDTH}
+                        height={GAME_HEIGHT}
+                        style={{ visibility: isReady ? 'visible' : 'hidden' }}
+                    >
                         Your browser does not support the canvas tag.
                     </canvas>
 
@@ -225,7 +230,7 @@ function GodotTeaser({ themeClass = 'theme-teal-gold' }) {
                         <img
                             id="godot-status-splash"
                             className="show-image--true fullsize--true use-filter--true"
-                            src="/teaser/ResumeTeaser.png"
+                            src="/teaser/ResumeTeaser.webp"
                             alt="Loading..."
                         />
                         <progress id="godot-status-progress"></progress>

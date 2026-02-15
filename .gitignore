@@ -25,4 +25,5 @@ dist-ssr
 
 RESUME_SCRATCHPAD.md
 Export/
-public/teaser/
+public/teaser/*
+!public/teaser/ResumeTeaser.webp

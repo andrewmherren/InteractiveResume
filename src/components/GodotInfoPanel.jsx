@@ -1,7 +1,14 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 const GodotInfoPanel = ({ activeOption, selection, onClear }) => {
     const hasSelection = Boolean(activeOption || selection)
+    const [animateKey, setAnimateKey] = useState(0)
+
+    useEffect(() => {
+        if (activeOption) {
+            setAnimateKey(prev => prev + 1)
+        }
+    }, [activeOption?.actionData])
 
     const handleScroll = () => {
         const target = document.getElementById(activeOption?.cta?.targetId || 'experience')
@@ -11,7 +18,7 @@ const GodotInfoPanel = ({ activeOption, selection, onClear }) => {
     }
 
     return (
-        <aside className="godot-panel glass rounded-2xl p-6">
+        <aside key={animateKey} className="godot-panel glass rounded-2xl p-6 panel-change-animate">
             <div className="flex items-start justify-between gap-4">
                 <div>
                     <p className="text-xs uppercase tracking-[0.2em] text-slate-400">

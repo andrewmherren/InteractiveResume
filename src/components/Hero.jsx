@@ -45,7 +45,7 @@ const Hero = () => {
     return (
         <div className="relative z-10 max-w-3xl mx-auto">
             <div className="stagger-children">
-                <div className="mb-8 flex justify-center lg:justify-start">
+                <div className="mb-8 flex justify-center">
                     <div className="w-28 h-28 md:w-36 md:h-36 rounded-full overflow-hidden border-4 border-amber-500/50 glow">
                         <img
                             src="/photo1.jpg"
@@ -59,12 +59,12 @@ const Hero = () => {
                     </div>
                 </div>
 
-                <h1 className="text-5xl md:text-7xl font-bold text-center lg:text-left mb-4">
+                <h1 className="text-5xl md:text-7xl font-bold text-center mb-4">
                     <span className="gradient-text text-glow">Systems Builder</span>
                 </h1>
 
-                <div className="h-16 md:h-20 flex items-center justify-center lg:justify-start mb-8">
-                    <p className="text-xl md:text-3xl text-slate-300 text-center lg:text-left">
+                <div className="h-16 md:h-20 flex items-center justify-center mb-8">
+                    <p className="text-xl md:text-3xl text-slate-300 text-center">
                         {displayText}
                         <span className="typing-cursor" />
                     </p>
@@ -85,7 +85,7 @@ const Hero = () => {
                     </div>
                 </div>
 
-                <div className="flex gap-6 justify-center lg:justify-start">
+                <div className="flex gap-6 justify-center">
                     <a
                         href="https://github.com/andrewmherren"
                         target="_blank"
