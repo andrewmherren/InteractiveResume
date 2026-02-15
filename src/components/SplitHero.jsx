@@ -17,29 +17,23 @@ const SplitHero = () => {
     return (
         <section className="tv-hero-section relative py-6 md:py-10">
             <div className="max-w-7xl mx-auto px-4">
-                <div className="grid lg:grid-cols-2 gap-6 lg:gap-8 items-center">
+                <div className={`grid gap-6 lg:gap-8 items-center ${isPanelVisible ? 'lg:grid-cols-2' : 'lg:grid-cols-1'}`}>
                     <div
-                        className="flex justify-start transition-transform duration-700 ease-in-out"
-                        style={{
-                            transform: isPanelVisible ? 'translateX(0)' : 'translateX(50%)'
-                        }}
+                        className="flex justify-center transition-all duration-700 ease-in-out"
                     >
-                        <GodotTeaser />
+                        <GodotTeaser isPanelVisible={isPanelVisible} />
                     </div>
-                    <div
-                        className="flex flex-col gap-6 transition-all duration-700 ease-in-out"
-                        style={{
-                            transform: isPanelVisible ? 'translateX(0)' : 'translateX(100%)',
-                            opacity: isPanelVisible ? 1 : 0,
-                            pointerEvents: isPanelVisible ? 'auto' : 'none'
-                        }}
-                    >
-                        <GodotInfoPanel
-                            activeOption={activeOption}
-                            selection={selection}
-                            onClear={clearSelection}
-                        />
-                    </div>
+                    {isPanelVisible && (
+                        <div
+                            className="flex flex-col gap-6 transition-all duration-700 ease-in-out animate-slide-in-right"
+                        >
+                            <GodotInfoPanel
+                                activeOption={activeOption}
+                                selection={selection}
+                                onClear={clearSelection}
+                            />
+                        </div>
+                    )}
                 </div>
             </div>
         </section>

@@ -73,6 +73,22 @@ body {
   }
 }
 
+.animate-slide-in-right {
+  animation: slideInRight 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideInRight {
+  0% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 /* Animated gradient background */
 .gradient-bg {
   background: linear-gradient(135deg, #0f172a 0%, #1c1917 50%, #0f172a 100%);

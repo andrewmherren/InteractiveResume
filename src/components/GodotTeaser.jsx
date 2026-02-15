@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 
-function GodotTeaser() {
+function GodotTeaser({ isPanelVisible = false }) {
     const containerRef = useRef(null)
     const [scale, setScale] = useState(1)
     const [isReady, setIsReady] = useState(false)
@@ -212,7 +212,9 @@ function GodotTeaser() {
             const scaleY = containerHeight / GAME_HEIGHT
 
             // Use the smaller scale to ensure it fits
-            const newScale = Math.min(scaleX, scaleY, 0.65) // Max 65% scale
+            // Constrain further when panel is visible to prevent overlap
+            const maxScale = isPanelVisible ? 0.53 : 0.65
+            const newScale = Math.min(scaleX, scaleY, maxScale)
 
             setScale(newScale)
         }
@@ -221,7 +223,7 @@ function GodotTeaser() {
 
         globalThis.addEventListener('resize', calculateScale)
         return () => globalThis.removeEventListener('resize', calculateScale)
-    }, [])
+    }, [isPanelVisible])
 
     // Load Godot engine and initialize
     useEffect(() => {
