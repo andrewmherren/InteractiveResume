@@ -20,6 +20,80 @@ function GodotTeaser() {
         }
     }, [])
 
+    // Set up page-level mouse tracking for Godot
+    useEffect(() => {
+        let isTracking = false
+        let checkInterval
+
+        function waitForGodot() {
+            if (window.godotSetMousePosition) {
+                initMouseTracking()
+                if (checkInterval) {
+                    clearInterval(checkInterval)
+                }
+            }
+        }
+
+        function initMouseTracking() {
+            if (isTracking) return
+
+            const canvas = document.querySelector('#godot-canvas')
+            if (!canvas) {
+                console.warn('[MouseTracking] Canvas not found for mouse tracking')
+                return
+            }
+
+            // Track mouse movement across entire page
+            const handleMouseMove = (event) => {
+                // Get canvas bounding rect
+                const rect = canvas.getBoundingClientRect()
+
+                // Calculate mouse position relative to canvas
+                // Even if mouse is outside canvas, we map it to canvas coordinates
+                let x = event.clientX - rect.left
+                let y = event.clientY - rect.top
+
+                // Map to Godot's internal resolution (canvas size * device pixel ratio)
+                const scaleX = canvas.width / rect.width
+                const scaleY = canvas.height / rect.height
+
+                x *= scaleX
+                y *= scaleY
+
+                // Send to Godot
+                if (window.godotSetMousePosition) {
+                    try {
+                        window.godotSetMousePosition([x, y])
+                    } catch (e) {
+                        console.error('[MouseTracking] Error calling godotSetMousePosition:', e)
+                    }
+                }
+            }
+
+            document.addEventListener('mousemove', handleMouseMove)
+            isTracking = true
+
+            // Return cleanup function
+            return () => {
+                document.removeEventListener('mousemove', handleMouseMove)
+                isTracking = false
+            }
+        }
+
+        // Start checking for Godot after a short delay
+        const timeoutId = setTimeout(() => {
+            checkInterval = setInterval(waitForGodot, 100)
+        }, 500)
+
+        // Cleanup
+        return () => {
+            clearTimeout(timeoutId)
+            if (checkInterval) {
+                clearInterval(checkInterval)
+            }
+        }
+    }, [])
+
     useEffect(() => {
         const calculateScale = () => {
             if (!containerRef.current) return
