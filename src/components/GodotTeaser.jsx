@@ -4,6 +4,10 @@ function GodotTeaser() {
     const containerRef = useRef(null)
     const [scale, setScale] = useState(1)
     const [isReady, setIsReady] = useState(false)
+    const [isInView, setIsInView] = useState(false)
+    const hasTriggeredPowerOn = useRef(false)
+    const readyTimestamp = useRef(null)
+    const inViewTimestamp = useRef(null)
 
     // Original game dimensions
     const GAME_WIDTH = 1080
@@ -25,12 +29,42 @@ function GodotTeaser() {
     useEffect(() => {
         let isTracking = false
         let checkInterval
+        let lastMouseX = 0
+        let lastMouseY = 0
 
         function waitForGodot() {
             if (window.godotSetMousePosition) {
                 initMouseTracking()
                 if (checkInterval) {
                     clearInterval(checkInterval)
+                }
+            }
+        }
+
+        function updateGodotMousePosition(clientX, clientY) {
+            const canvas = document.querySelector('#godot-canvas')
+            if (!canvas) return
+
+            // Get canvas bounding rect
+            const rect = canvas.getBoundingClientRect()
+
+            // Calculate mouse position relative to canvas
+            let x = clientX - rect.left
+            let y = clientY - rect.top
+
+            // Map to Godot's internal resolution (canvas size * device pixel ratio)
+            const scaleX = canvas.width / rect.width
+            const scaleY = canvas.height / rect.height
+
+            x *= scaleX
+            y *= scaleY
+
+            // Send to Godot
+            if (window.godotSetMousePosition) {
+                try {
+                    window.godotSetMousePosition([x, y])
+                } catch (e) {
+                    console.error('[MouseTracking] Error calling godotSetMousePosition:', e)
                 }
             }
         }
@@ -46,37 +80,24 @@ function GodotTeaser() {
 
             // Track mouse movement across entire page
             const handleMouseMove = (event) => {
-                // Get canvas bounding rect
-                const rect = canvas.getBoundingClientRect()
+                lastMouseX = event.clientX
+                lastMouseY = event.clientY
+                updateGodotMousePosition(lastMouseX, lastMouseY)
+            }
 
-                // Calculate mouse position relative to canvas
-                // Even if mouse is outside canvas, we map it to canvas coordinates
-                let x = event.clientX - rect.left
-                let y = event.clientY - rect.top
-
-                // Map to Godot's internal resolution (canvas size * device pixel ratio)
-                const scaleX = canvas.width / rect.width
-                const scaleY = canvas.height / rect.height
-
-                x *= scaleX
-                y *= scaleY
-
-                // Send to Godot
-                if (window.godotSetMousePosition) {
-                    try {
-                        window.godotSetMousePosition([x, y])
-                    } catch (e) {
-                        console.error('[MouseTracking] Error calling godotSetMousePosition:', e)
-                    }
-                }
+            // Track scroll events to update mouse position relative to canvas
+            const handleScroll = () => {
+                updateGodotMousePosition(lastMouseX, lastMouseY)
             }
 
             document.addEventListener('mousemove', handleMouseMove)
+            document.addEventListener('scroll', handleScroll, true) // Use capture to catch all scroll events
             isTracking = true
 
             // Return cleanup function
             return () => {
                 document.removeEventListener('mousemove', handleMouseMove)
+                document.removeEventListener('scroll', handleScroll, true)
                 isTracking = false
             }
         }
@@ -96,12 +117,16 @@ function GodotTeaser() {
     }, [])
 
     useEffect(() => {
-        const handleReadyEvent = () => setIsReady(true)
+        const handleReadyEvent = () => {
+            readyTimestamp.current = Date.now()
+            setIsReady(true)
+        }
         window.addEventListener('godot-engine-ready', handleReadyEvent)
 
         const markReadyIfStatusGone = () => {
             const statusOverlay = document.getElementById('godot-status')
             if (!statusOverlay) {
+                readyTimestamp.current = Date.now()
                 setIsReady(true)
                 return true
             }
@@ -125,6 +150,55 @@ function GodotTeaser() {
             observer.disconnect()
         }
     }, [])
+
+    // Track when TV container is in view
+    useEffect(() => {
+        if (!containerRef.current) return
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        inViewTimestamp.current = Date.now()
+                        setIsInView(true)
+                    }
+                })
+            },
+            {
+                threshold: 0.1, // Trigger when 10% visible
+            }
+        )
+
+        observer.observe(containerRef.current)
+
+        return () => observer.disconnect()
+    }, [])
+
+    // Power on TV when both ready and in view
+    useEffect(() => {
+        if (isReady && isInView && !hasTriggeredPowerOn.current) {
+            // Determine delay based on which condition was met first
+            const readyFirst = readyTimestamp.current < inViewTimestamp.current
+            const delay = readyFirst ? 1.0 : 0.0
+
+            console.log('[GodotTeaser] Powering up TV - ready:', isReady, 'in view:', isInView)
+            console.log('[GodotTeaser] Ready first:', readyFirst, '- Using delay:', delay)
+
+            // Wait for Godot callback to be available
+            const tryPowerOn = () => {
+                if (window.godotStartTVPowerUp) {
+                    console.log('[GodotTeaser] Calling godotStartTVPowerUp with delay:', delay)
+                    window.godotStartTVPowerUp(delay)
+                    hasTriggeredPowerOn.current = true
+                } else {
+                    console.log('[GodotTeaser] Waiting for godotStartTVPowerUp...')
+                    setTimeout(tryPowerOn, 100)
+                }
+            }
+
+            tryPowerOn()
+        }
+    }, [isReady, isInView])
 
     useEffect(() => {
         const calculateScale = () => {
@@ -211,6 +285,7 @@ function GodotTeaser() {
                         src="/teaser/ResumeTeaser.webp"
                         alt="Resume teaser preview"
                         className={`teaser-poster ${isReady ? 'teaser-poster-hidden' : ''}`}
+                        style={{ transform: 'scale(1.02)' }}
                     />
 
                     <canvas
