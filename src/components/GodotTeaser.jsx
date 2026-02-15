@@ -250,11 +250,19 @@ function GodotTeaser() {
             document.body.appendChild(loaderScript)
         }
 
-        // Wait for hero typing to complete first phrase, then load during the pause
-        const handleTypingComplete = () => {
-            console.log('[GodotTeaser] Hero typing complete - loading Godot during pause')
-            // Load Godot engine script during the typing pause
+        // Check if Hero typing text is visible on page load
+        const checkHeroVisibility = () => {
+            const typingElement = document.getElementById('hero-typing-text')
+            if (!typingElement) return false
+
+            const rect = typingElement.getBoundingClientRect()
+            const isVisible = rect.top < window.innerHeight && rect.bottom > 0
+            return isVisible
+        }
+
+        const loadGodotEngine = () => {
             if (!existingEngineScript && !document.querySelector('script[data-godot-teaser="engine"]')) {
+                console.log('[GodotTeaser] Loading Godot engine')
                 const engineScript = document.createElement('script')
                 engineScript.src = '/teaser/ResumeTeaser.js'
                 engineScript.async = true
@@ -271,10 +279,25 @@ function GodotTeaser() {
             }
         }
 
-        window.addEventListener('hero-typing-complete', handleTypingComplete)
+        // Determine loading strategy based on Hero visibility
+        const heroVisible = checkHeroVisibility()
+
+        if (heroVisible) {
+            // Hero is visible - wait for typing to complete
+            console.log('[GodotTeaser] Hero visible - waiting for typing complete')
+            const handleTypingComplete = () => {
+                console.log('[GodotTeaser] Hero typing complete - loading Godot during pause')
+                loadGodotEngine()
+            }
+            window.addEventListener('hero-typing-complete', handleTypingComplete, { once: true })
+        } else {
+            // Hero not visible - load immediately
+            console.log('[GodotTeaser] Hero not visible - loading Godot immediately')
+            loadGodotEngine()
+        }
 
         return () => {
-            window.removeEventListener('hero-typing-complete', handleTypingComplete)
+            window.removeEventListener('hero-typing-complete', loadGodotEngine)
         }
     }, [])
 

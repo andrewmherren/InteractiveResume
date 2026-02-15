@@ -84,7 +84,7 @@ const Hero = () => {
                     <span className="gradient-text text-glow">Systems Builder</span>
                 </h1>
 
-                <div className="h-16 md:h-20 flex items-center justify-center mb-8">
+                <div id="hero-typing-text" className="h-16 md:h-20 flex items-center justify-center mb-8">
                     <p className="text-xl md:text-3xl text-slate-300 text-center">
                         <span ref={textRef}></span>
                         <span className="typing-cursor" />
