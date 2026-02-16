@@ -25,6 +25,18 @@ function GodotTeaser({ isPanelVisible = false }) {
         }
     }, [])
 
+    // Set up the generic action handler from Godot (non-web actions)
+    useEffect(() => {
+        window.handleGodotGenericAction = function (payload) {
+            console.log('[GodotTeaser] Generic action received:', payload)
+            try {
+                window.dispatchEvent(new CustomEvent('godot-generic-action', { detail: payload }))
+            } catch (e) {
+                console.error('[GodotTeaser] Error dispatching generic action event:', e)
+            }
+        }
+    }, [])
+
     // Set up page-level mouse tracking for Godot
     useEffect(() => {
         let isTracking = false
@@ -227,6 +239,13 @@ function GodotTeaser({ isPanelVisible = false }) {
 
     // Load Godot engine and initialize
     useEffect(() => {
+        if (typeof window.set !== 'function') {
+            window.set = (key, value) => {
+                window[key] = value
+                return value
+            }
+        }
+
         const existingEngineScript = document.querySelector('script[data-godot-teaser="engine"]')
         const existingLoaderScript = document.querySelector('script[data-godot-teaser="loader"]')
 
@@ -283,23 +302,43 @@ function GodotTeaser({ isPanelVisible = false }) {
 
         // Determine loading strategy based on Hero visibility
         const heroVisible = checkHeroVisibility()
+        let hasLoaded = false
 
         if (heroVisible) {
-            // Hero is visible - wait for typing to complete
-            console.log('[GodotTeaser] Hero visible - waiting for typing complete')
+            // Hero is visible - wait for typing to complete OR hero scrolling out of view
+            console.log('[GodotTeaser] Hero visible - waiting for typing complete or scroll away')
+
             const handleTypingComplete = () => {
-                console.log('[GodotTeaser] Hero typing complete - loading Godot during pause')
-                loadGodotEngine()
+                if (!hasLoaded) {
+                    console.log('[GodotTeaser] Hero typing complete - loading Godot during pause')
+                    hasLoaded = true
+                    loadGodotEngine()
+                    cleanup()
+                }
             }
+
+            const handleScroll = () => {
+                if (!hasLoaded && !checkHeroVisibility()) {
+                    console.log('[GodotTeaser] Hero scrolled out of view - loading Godot immediately')
+                    hasLoaded = true
+                    loadGodotEngine()
+                    cleanup()
+                }
+            }
+
+            const cleanup = () => {
+                window.removeEventListener('hero-typing-complete', handleTypingComplete)
+                window.removeEventListener('scroll', handleScroll)
+            }
+
             window.addEventListener('hero-typing-complete', handleTypingComplete, { once: true })
+            window.addEventListener('scroll', handleScroll, { passive: true })
+
+            return cleanup
         } else {
             // Hero not visible - load immediately
             console.log('[GodotTeaser] Hero not visible - loading Godot immediately')
             loadGodotEngine()
-        }
-
-        return () => {
-            window.removeEventListener('hero-typing-complete', loadGodotEngine)
         }
     }, [])
 

@@ -34,6 +34,64 @@ body {
   margin: 0 auto;
 }
 
+.tv-hero-layout {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.tv-teaser-slot {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.tv-panel-slot {
+  width: 100%;
+}
+
+.tv-panel-hidden {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .tv-hero-layout {
+    min-height: 520px;
+  }
+
+  .tv-teaser-slot {
+    transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+  }
+
+  .tv-teaser-shift {
+    transform: translateX(-18%);
+  }
+
+  .tv-panel-slot {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: min(38%, 420px);
+    transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .tv-panel-hidden {
+    display: block;
+    opacity: 0;
+    transform: translateX(24px);
+    pointer-events: none;
+  }
+
+  .tv-panel-visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 .teaser-poster {
   position: absolute;
   inset: 0;

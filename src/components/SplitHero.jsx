@@ -14,26 +14,35 @@ const SplitHero = () => {
         }
     }, [activeOption, isPanelVisible])
 
+    useEffect(() => {
+        const handleGenericAction = () => {
+            clearSelection()
+            setIsPanelVisible(false)
+        }
+
+        window.addEventListener('godot-generic-action', handleGenericAction)
+        return () => window.removeEventListener('godot-generic-action', handleGenericAction)
+    }, [clearSelection])
+
     return (
         <section className="tv-hero-section relative py-6 md:py-10">
             <div className="max-w-7xl mx-auto px-4">
-                <div className={`grid gap-6 lg:gap-8 items-center ${isPanelVisible ? 'lg:grid-cols-2' : 'lg:grid-cols-1'}`}>
+                <div className="tv-hero-layout">
                     <div
-                        className="flex justify-center transition-all duration-700 ease-in-out"
+                        className={`tv-teaser-slot ${isPanelVisible ? 'tv-teaser-shift' : ''}`}
                     >
                         <GodotTeaser isPanelVisible={isPanelVisible} />
                     </div>
-                    {isPanelVisible && (
-                        <div
-                            className="flex flex-col gap-6 transition-all duration-700 ease-in-out animate-slide-in-right"
-                        >
-                            <GodotInfoPanel
-                                activeOption={activeOption}
-                                selection={selection}
-                                onClear={clearSelection}
-                            />
-                        </div>
-                    )}
+                    <div
+                        className={`tv-panel-slot ${isPanelVisible ? 'tv-panel-visible' : 'tv-panel-hidden'}`}
+                        aria-hidden={!isPanelVisible}
+                    >
+                        <GodotInfoPanel
+                            activeOption={activeOption}
+                            selection={selection}
+                            onClear={clearSelection}
+                        />
+                    </div>
                 </div>
             </div>
         </section>

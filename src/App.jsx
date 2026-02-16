@@ -7,7 +7,7 @@ import './index.css'
 function App() {
   return (
     <div className="min-h-screen gradient-bg text-slate-100">
-      <section className="hero-section flex items-center justify-center px-4 pt-24 pb-16 md:pt-32 md:pb-20 relative overflow-hidden">
+      <section className="hero-section flex items-center justify-center px-4 pt-32 pb-24 md:pt-40 md:pb-32 relative overflow-hidden">
         <div className="floating-keyword floating-keyword-1">AWS</div>
         <div className="floating-keyword floating-keyword-2">React</div>
         <div className="floating-keyword floating-keyword-3">Laravel</div>
