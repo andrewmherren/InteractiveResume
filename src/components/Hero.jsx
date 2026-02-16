@@ -1,14 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { roles } from '../data/resumeData';
 
 const Hero = () => {
-    const roles = [
-        "Architected for enterprise healthcare scale",
-        "Built systems that survived acquisition",
-        "Full-stack pragmatist",
-        "AWS + healthcare compliance",
-        "From MVP to enterprise product"
-    ];
-
     const textRef = useRef(null);
     const [currentRole, setCurrentRole] = useState(0);
     const displayText = useRef('');
@@ -19,43 +12,56 @@ const Hero = () => {
     useEffect(() => {
         let timeoutId;
 
+        const updateText = (text) => {
+            displayText.current = text;
+            if (textRef.current) {
+                textRef.current.textContent = text;
+            }
+        };
+
+        const signalGodotLoad = () => {
+            if (hasSignaledGodotLoad.current) {
+                return;
+            }
+
+            hasSignaledGodotLoad.current = true;
+            // Use window for DOM event dispatch to keep browser intent explicit.
+            window.dispatchEvent(new CustomEvent('hero-typing-complete')); // NOSONAR
+        };
+
         const type = () => {
             const role = roles[currentRole];
+            const currentText = displayText.current;
 
             if (isDeleting.current) {
-                if (displayText.current.length > 0) {
-                    // delete a character
-                    displayText.current = displayText.current.slice(0, -1);
-                    if (textRef.current) {
-                        textRef.current.textContent = displayText.current;
-                    }
-                    timeoutId = setTimeout(type, 30);
-                } else {
+                if (currentText.length === 0) {
                     // everything deleted, switch to next role
                     isDeleting.current = false;
                     setCurrentRole((prev) => (prev + 1) % roles.length);
                     timeoutId = setTimeout(type, 100);
+                    return;
                 }
-            } else {
-                if (displayText.current.length < role.length) {
-                    // add a character
-                    displayText.current = role.slice(0, displayText.current.length + 1);
-                    if (textRef.current) {
-                        textRef.current.textContent = displayText.current;
-                    }
-                    timeoutId = setTimeout(type, 80);
-                } else {
-                    // finished typing first phrase - signal Godot to load during the pause
-                    if (!hasSignaledGodotLoad.current) {
-                        hasSignaledGodotLoad.current = true;
-                        window.dispatchEvent(new CustomEvent('hero-typing-complete'));
-                        console.log('[Hero] First phrase complete - signaling Godot load');
-                    }
-                    // finished typing, start deleting after a pause
-                    isDeleting.current = true;
-                    timeoutId = setTimeout(type, 2000);
-                }
+
+                // delete a character
+                updateText(currentText.slice(0, -1));
+                timeoutId = setTimeout(type, 30);
+                return;
             }
+
+            if (currentText.length < role.length) {
+                // add a character
+                updateText(role.slice(0, currentText.length + 1));
+                timeoutId = setTimeout(type, 80);
+                return;
+            }
+
+            // signal Godot to load during the pause. We only actually load
+            // during the first pause but we signal during each pause and let
+            // godot code ignore subsequent signals in case of any timing issues with the first one
+            signalGodotLoad();
+            // finished typing, start deleting after a pause
+            isDeleting.current = true;
+            timeoutId = setTimeout(type, 2000);
         };
 
         timeoutId = setTimeout(type, 100);
@@ -69,7 +75,7 @@ const Hero = () => {
                 <div className="mb-8 flex justify-center">
                     <div className="w-28 h-28 md:w-36 md:h-36 rounded-full overflow-hidden border-4 border-amber-500/50 glow">
                         <img
-                            src="/photo1.jpg"
+                            src="/photo.jpg"
                             alt="Profile"
                             className="w-full h-full object-cover object-[-2px_center] scale-103" // slight scale and zoom to tailor image
                             onError={(e) => {
@@ -92,18 +98,30 @@ const Hero = () => {
                 </div>
 
                 <div className="grid grid-cols-3 gap-4 mb-10 w-full max-w-2xl mx-auto px-12 md:px-18">
-                    <div className="glass rounded-xl p-4 text-center hover-lift cursor-pointer" onClick={() => document.getElementById('experience').scrollIntoView({ behavior: 'smooth' })}>
+                    <button
+                        className="glass rounded-xl p-4 text-center hover-lift cursor-pointer"
+                        onClick={() => document.getElementById('experience').scrollIntoView({ behavior: 'smooth' })}
+                        aria-label="View experience section - 18+ years of experience"
+                    >
                         <div className="text-3xl md:text-4xl font-bold gradient-text">18+</div>
                         <div className="text-xs md:text-sm text-slate-400">Years Experience</div>
-                    </div>
-                    <div className="glass rounded-xl p-4 text-center hover-lift cursor-pointer" onClick={() => document.getElementById('experience').scrollIntoView({ behavior: 'smooth' })}>
+                    </button>
+                    <button
+                        className="glass rounded-xl p-4 text-center hover-lift cursor-pointer"
+                        onClick={() => document.getElementById('experience').scrollIntoView({ behavior: 'smooth' })}
+                        aria-label="View experience section - 1 successful exit"
+                    >
                         <div className="text-3xl md:text-4xl font-bold gradient-text">1</div>
                         <div className="text-xs md:text-sm text-slate-400">Successful Exit</div>
-                    </div>
-                    <div className="glass rounded-xl p-4 text-center hover-lift cursor-pointer" onClick={() => document.getElementById('experience').scrollIntoView({ behavior: 'smooth' })}>
+                    </button>
+                    <button
+                        className="glass rounded-xl p-4 text-center hover-lift cursor-pointer"
+                        onClick={() => document.getElementById('experience').scrollIntoView({ behavior: 'smooth' })}
+                        aria-label="View experience section - 3 engineering degrees"
+                    >
                         <div className="text-3xl md:text-4xl font-bold gradient-text">3</div>
                         <div className="text-xs md:text-sm text-slate-400">Engineering Degrees</div>
-                    </div>
+                    </button>
                 </div>
 
                 <div className="flex gap-6 justify-center">

@@ -270,6 +270,16 @@ body {
   perspective: 1000px;
 }
 
+button.flip-card {
+  display: block;
+  width: 100%;
+  border: none;
+  background: none;
+  padding: 0;
+  text-align: left;
+  font: inherit;
+}
+
 .flip-card-inner {
   position: relative;
   width: 100%;

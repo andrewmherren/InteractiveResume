@@ -10,11 +10,7 @@ export const GODOT_OPTIONS = [
             'Created reusable action library for clinical steps',
             'Enabled per-client workflow assembly without forks',
             'Improved maintainability while accelerating delivery'
-        ],
-        cta: {
-            label: 'See the architecture story',
-            targetId: 'experience'
-        }
+        ]
     },
     {
         zone: 'Zone2',
@@ -27,11 +23,7 @@ export const GODOT_OPTIONS = [
             'Bridged legacy systems with new platform standards',
             'Partnered with compliance and cloud teams',
             'Kept releases steady during the transition'
-        ],
-        cta: {
-            label: 'View acquisition impact',
-            targetId: 'experience'
-        }
+        ]
     },
     {
         zone: 'Zone3',
@@ -44,11 +36,7 @@ export const GODOT_OPTIONS = [
             'AWS ECS + RDS architecture for reliability',
             'Built CI/CD pipelines for rapid iteration',
             'Focus on performance under real-world load'
-        ],
-        cta: {
-            label: 'Explore scale details',
-            targetId: 'experience'
-        }
+        ]
     },
     {
         zone: 'Zone4',
@@ -61,11 +49,7 @@ export const GODOT_OPTIONS = [
             'Mapped data flows to compliance controls',
             'Coordinated with security and audit teams',
             'Reduced operational risk without slowing delivery'
-        ],
-        cta: {
-            label: 'Read compliance work',
-            targetId: 'experience'
-        }
+        ]
     },
     {
         zone: 'Zone5',
@@ -78,10 +62,6 @@ export const GODOT_OPTIONS = [
             'Designed Arduino-based serial data logger',
             'Enabled capture of low-frequency failures',
             'Turned field data into actionable fixes'
-        ],
-        cta: {
-            label: 'See diagnostics story',
-            targetId: 'experience'
-        }
+        ]
     }
 ]

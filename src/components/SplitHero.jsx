@@ -7,6 +7,11 @@ const SplitHero = () => {
     const { selection, activeOption, clearSelection } = useGodotSelection()
     const [isPanelVisible, setIsPanelVisible] = useState(false)
 
+    const handleGenericAction = () => {
+        clearSelection()
+        setIsPanelVisible(false)
+    }
+
     // Show panel when user first clicks a zone with info
     useEffect(() => {
         if (activeOption && !isPanelVisible) {
@@ -15,14 +20,15 @@ const SplitHero = () => {
     }, [activeOption, isPanelVisible])
 
     useEffect(() => {
-        const handleGenericAction = () => {
-            clearSelection()
-            setIsPanelVisible(false)
+        // GodotTeaser.jsx will dispatch 'godot-generic-action' when the godot game calls globalThis.handleGodotGenericAction(payload)
+        // when this happens we want to clear any active selection and hide the info panel to reset the UI for the next interaction
+        // Use window for DOM events to keep browser intent explicit.
+        window.addEventListener('godot-generic-action', handleGenericAction) // NOSONAR
+        return () => {
+            // Use window for DOM events to keep browser intent explicit.
+            window.removeEventListener('godot-generic-action', handleGenericAction) // NOSONAR
         }
-
-        window.addEventListener('godot-generic-action', handleGenericAction)
-        return () => window.removeEventListener('godot-generic-action', handleGenericAction)
-    }, [clearSelection])
+    }, [handleGenericAction])
 
     return (
         <section className="tv-hero-section relative py-6 md:py-10">
@@ -40,7 +46,7 @@ const SplitHero = () => {
                         <GodotInfoPanel
                             activeOption={activeOption}
                             selection={selection}
-                            onClear={clearSelection}
+                            onClear={handleGenericAction}
                         />
                     </div>
                 </div>

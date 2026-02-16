@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import PropTypes from 'prop-types'
 
 function GodotTeaser({ isPanelVisible = false }) {
     const containerRef = useRef(null)
@@ -15,10 +16,10 @@ function GodotTeaser({ isPanelVisible = false }) {
 
     // Set up the zone click handler from Godot
     useEffect(() => {
-        window.handleGodotZoneClick = function (payload) {
-            console.log('[GodotTeaser] Zone click received:', payload)
+        globalThis.handleGodotZoneClick = function (payload) {
             try {
-                window.dispatchEvent(new CustomEvent('godot-zone-click', { detail: payload }))
+                // Use window for DOM event dispatch to keep the browser-specific intent clear.
+                window.dispatchEvent(new CustomEvent('godot-zone-click', { detail: payload })) // NOSONAR
             } catch (e) {
                 console.error('[GodotTeaser] Error dispatching event:', e)
             }
@@ -27,10 +28,10 @@ function GodotTeaser({ isPanelVisible = false }) {
 
     // Set up the generic action handler from Godot (non-web actions)
     useEffect(() => {
-        window.handleGodotGenericAction = function (payload) {
-            console.log('[GodotTeaser] Generic action received:', payload)
+        globalThis.handleGodotGenericAction = function (payload) {
             try {
-                window.dispatchEvent(new CustomEvent('godot-generic-action', { detail: payload }))
+                // Use window for DOM event dispatch to keep the browser-specific intent clear.
+                window.dispatchEvent(new CustomEvent('godot-generic-action', { detail: payload })) // NOSONAR
             } catch (e) {
                 console.error('[GodotTeaser] Error dispatching generic action event:', e)
             }
@@ -45,7 +46,7 @@ function GodotTeaser({ isPanelVisible = false }) {
         let lastMouseY = 0
 
         function waitForGodot() {
-            if (window.godotSetMousePosition) {
+            if (globalThis.godotSetMousePosition) {
                 initMouseTracking()
                 if (checkInterval) {
                     clearInterval(checkInterval)
@@ -72,9 +73,9 @@ function GodotTeaser({ isPanelVisible = false }) {
             y *= scaleY
 
             // Send to Godot
-            if (window.godotSetMousePosition) {
+            if (globalThis.godotSetMousePosition) {
                 try {
-                    window.godotSetMousePosition([x, y])
+                    globalThis.godotSetMousePosition([x, y])
                 } catch (e) {
                     console.error('[MouseTracking] Error calling godotSetMousePosition:', e)
                 }
@@ -128,12 +129,16 @@ function GodotTeaser({ isPanelVisible = false }) {
         }
     }, [])
 
+    // Track Godot readiness via event and DOM observation and set the isReady boolean accordingly
+    // which drives the display of the canvas vs the loading overlay and also factors into when we trigger the TV power on sequence
     useEffect(() => {
+        // Track readiness via Godot's event and fall back to DOM status overlay image removal.
         const handleReadyEvent = () => {
             readyTimestamp.current = Date.now()
             setIsReady(true)
         }
-        window.addEventListener('godot-engine-ready', handleReadyEvent)
+        // Use window for DOM events to keep browser intent explicit.
+        window.addEventListener('godot-engine-ready', handleReadyEvent) // NOSONAR
 
         const markReadyIfStatusGone = () => {
             const statusOverlay = document.getElementById('godot-status')
@@ -146,7 +151,8 @@ function GodotTeaser({ isPanelVisible = false }) {
         }
 
         if (markReadyIfStatusGone()) {
-            return () => window.removeEventListener('godot-engine-ready', handleReadyEvent)
+            // Use window for DOM events to keep browser intent explicit.
+            return () => window.removeEventListener('godot-engine-ready', handleReadyEvent) // NOSONAR
         }
 
         const observer = new MutationObserver(() => {
@@ -158,7 +164,8 @@ function GodotTeaser({ isPanelVisible = false }) {
         observer.observe(document.body, { childList: true, subtree: true })
 
         return () => {
-            window.removeEventListener('godot-engine-ready', handleReadyEvent)
+            // Use window for DOM events to keep browser intent explicit.
+            window.removeEventListener('godot-engine-ready', handleReadyEvent) // NOSONAR
             observer.disconnect()
         }
     }, [])
@@ -191,19 +198,15 @@ function GodotTeaser({ isPanelVisible = false }) {
         if (isReady && isInView && !hasTriggeredPowerOn.current) {
             // Determine delay based on which condition was met first
             const readyFirst = readyTimestamp.current < inViewTimestamp.current
-            const delay = readyFirst ? 1.0 : 0.0
-
-            console.log('[GodotTeaser] Powering up TV - ready:', isReady, 'in view:', isInView)
-            console.log('[GodotTeaser] Ready first:', readyFirst, '- Using delay:', delay)
+            const delay = readyFirst ? 1.0 : 0.0 //NOSONAR
 
             // Wait for Godot callback to be available
             const tryPowerOn = () => {
-                if (window.godotStartTVPowerUp) {
-                    console.log('[GodotTeaser] Calling godotStartTVPowerUp with delay:', delay)
-                    window.godotStartTVPowerUp(delay)
+                if (globalThis.godotStartTVPowerUp) {
+                    globalThis.godotStartTVPowerUp(delay)
                     hasTriggeredPowerOn.current = true
                 } else {
-                    console.log('[GodotTeaser] Waiting for godotStartTVPowerUp...')
+                    // retry in case the jsbridge isn't ready yet (should be very soon after ready event)
                     setTimeout(tryPowerOn, 100)
                 }
             }
@@ -239,13 +242,15 @@ function GodotTeaser({ isPanelVisible = false }) {
 
     // Load Godot engine and initialize
     useEffect(() => {
-        if (typeof window.set !== 'function') {
-            window.set = (key, value) => {
-                window[key] = value
+        // Godot's JS export can call globalThis.set during boot; provide a shim if missing.
+        if (typeof globalThis.set !== 'function') {
+            globalThis.set = (key, value) => {
+                globalThis[key] = value
                 return value
             }
         }
 
+        // make sure we don't load multiple times in case of re-renders or if the user clicks around before the engine has loaded
         const existingEngineScript = document.querySelector('script[data-godot-teaser="engine"]')
         const existingLoaderScript = document.querySelector('script[data-godot-teaser="loader"]')
 
@@ -283,7 +288,6 @@ function GodotTeaser({ isPanelVisible = false }) {
 
         const loadGodotEngine = () => {
             if (!existingEngineScript && !document.querySelector('script[data-godot-teaser="engine"]')) {
-                console.log('[GodotTeaser] Loading Godot engine')
                 const engineScript = document.createElement('script')
                 engineScript.src = '/teaser/ResumeTeaser.js'
                 engineScript.async = true
@@ -306,11 +310,8 @@ function GodotTeaser({ isPanelVisible = false }) {
 
         if (heroVisible) {
             // Hero is visible - wait for typing to complete OR hero scrolling out of view
-            console.log('[GodotTeaser] Hero visible - waiting for typing complete or scroll away')
-
             const handleTypingComplete = () => {
                 if (!hasLoaded) {
-                    console.log('[GodotTeaser] Hero typing complete - loading Godot during pause')
                     hasLoaded = true
                     loadGodotEngine()
                     cleanup()
@@ -319,25 +320,43 @@ function GodotTeaser({ isPanelVisible = false }) {
 
             const handleScroll = () => {
                 if (!hasLoaded && !checkHeroVisibility()) {
-                    console.log('[GodotTeaser] Hero scrolled out of view - loading Godot immediately')
-                    hasLoaded = true
-                    loadGodotEngine()
                     cleanup()
                 }
             }
 
             const cleanup = () => {
-                window.removeEventListener('hero-typing-complete', handleTypingComplete)
-                window.removeEventListener('scroll', handleScroll)
+                // Use window for DOM events to keep browser intent explicit.
+                window.removeEventListener('hero-typing-complete', handleTypingComplete) // NOSONAR
+                window.removeEventListener('scroll', handleScroll) // NOSONAR
+                teserObserver.disconnect()
             }
 
-            window.addEventListener('hero-typing-complete', handleTypingComplete, { once: true })
-            window.addEventListener('scroll', handleScroll, { passive: true })
+            // Fallback: if TV container scrolls into view before typing completes, load godot engine immediately.
+            // This prevents race condition where user scrolls to TV before Hero typing pause triggers load.
+            const teserObserver = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting && !hasLoaded) {
+                            hasLoaded = true
+                            loadGodotEngine()
+                            cleanup()
+                        }
+                    })
+                },
+                { threshold: 0.1 }
+            )
+
+            // Use window for DOM events to keep browser intent explicit.
+            window.addEventListener('hero-typing-complete', handleTypingComplete, { once: true }) // NOSONAR
+            window.addEventListener('scroll', handleScroll, { passive: true }) // NOSONAR
+
+            if (containerRef.current) {
+                teserObserver.observe(containerRef.current)
+            }
 
             return cleanup
         } else {
             // Hero not visible - load immediately
-            console.log('[GodotTeaser] Hero not visible - loading Godot immediately')
             loadGodotEngine()
         }
     }, [])
@@ -389,6 +408,10 @@ function GodotTeaser({ isPanelVisible = false }) {
             </div>
         </div>
     )
+}
+
+GodotTeaser.propTypes = {
+    isPanelVisible: PropTypes.bool
 }
 
 export default GodotTeaser

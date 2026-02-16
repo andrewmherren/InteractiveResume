@@ -1,20 +1,34 @@
 import { useEffect, useMemo, useState } from 'react'
 import { GODOT_OPTIONS } from '../data/godotOptions'
 
+// Godot option shape:
+// {
+//     zone: 'Zone1',
+//     actionData: 'architecture',
+//     label: 'Architecture',
+//     title: 'Modular Workflow Architecture',
+//     summary: 'Brief description of the feature or achievement...',
+//     bullets: [
+//         'Key point 1',
+//         'Key point 2',
+//         'Key point 3'
+//     ],
+//     cta: {
+//         label: 'See the story',
+//         targetId: 'experience'
+//     }
+// }
+
 const buildOptionMaps = (options) => {
     const byZone = new Map()
-    const byActionData = new Map()
 
     options.forEach((option) => {
         if (option.zone) {
             byZone.set(option.zone, option)
         }
-        if (option.actionData) {
-            byActionData.set(option.actionData, option)
-        }
     })
 
-    return { byZone, byActionData }
+    return { byZone }
 }
 
 export const useGodotSelection = () => {
@@ -28,17 +42,18 @@ export const useGodotSelection = () => {
             const payload = event?.detail ?? event
             if (!payload) return
 
-            const matchedOption =
-                optionMaps.byZone.get(payload.zone_name) ||
-                optionMaps.byActionData.get(payload.action_data) ||
-                null
+            const matchedOption = optionMaps.byZone.get(payload.zone_name) || null
 
             setSelection(payload)
             setActiveOption(matchedOption)
         }
 
-        window.addEventListener('godot-zone-click', handleSelection)
-        return () => window.removeEventListener('godot-zone-click', handleSelection)
+        // Use window for DOM events to keep browser intent explicit.
+        window.addEventListener('godot-zone-click', handleSelection) // NOSONAR
+        return () => {
+            // Use window for DOM events to keep browser intent explicit.
+            window.removeEventListener('godot-zone-click', handleSelection) // NOSONAR
+        }
     }, [optionMaps])
 
     const clearSelection = () => {

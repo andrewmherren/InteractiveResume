@@ -8,9 +8,11 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "update-teaser": "powershell -Command \"New-Item -ItemType Directory -Path public/teaser -Force | Out-Null; Copy-Item -Path src/teaser/* -Destination public/teaser -Force; Copy-Item -Path Export/ResumeTeaser.js, Export/ResumeTeaser.pck, Export/ResumeTeaser.wasm, Export/ResumeTeaser.audio.worklet.js, Export/ResumeTeaser.audio.position.worklet.js -Destination public/teaser -Force -ErrorAction SilentlyContinue; Write-Host 'Teaser files updated successfully!' -ForegroundColor Green\""
+    "update-teaser": "powershell -ExecutionPolicy Bypass -File ./update-teaser.ps1",
+    "update-teaser-sizes": "powershell -ExecutionPolicy Bypass -File ./update-teaser-sizes.ps1"
   },
   "dependencies": {
+    "prop-types": "^15.8.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
