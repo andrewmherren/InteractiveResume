@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
+import { initGodot } from '../utils/initGodot'
 
 function GodotTeaser({ isPanelVisible = false }) {
     const containerRef = useRef(null)
@@ -252,9 +253,8 @@ function GodotTeaser({ isPanelVisible = false }) {
 
         // make sure we don't load multiple times in case of re-renders or if the user clicks around before the engine has loaded
         const existingEngineScript = document.querySelector('script[data-godot-teaser="engine"]')
-        const existingLoaderScript = document.querySelector('script[data-godot-teaser="loader"]')
 
-        if (existingEngineScript && existingLoaderScript) {
+        if (existingEngineScript) {
             return
         }
 
@@ -265,15 +265,6 @@ function GodotTeaser({ isPanelVisible = false }) {
             cssLink.href = '/teaser/godot-teaser.css'
             cssLink.dataset.godotTeaser = 'styles'
             document.head.appendChild(cssLink)
-        }
-
-        // Load loader script FIRST (sets up handler before engine loads)
-        if (!existingLoaderScript) {
-            const loaderScript = document.createElement('script')
-            loaderScript.src = '/teaser/godot-loader.js'
-            loaderScript.async = false  // Load synchronously to ensure it runs before engine
-            loaderScript.dataset.godotTeaser = 'loader'
-            document.body.appendChild(loaderScript)
         }
 
         // Check if Hero typing text is visible on page load
@@ -287,17 +278,17 @@ function GodotTeaser({ isPanelVisible = false }) {
         }
 
         const loadGodotEngine = () => {
-            if (!existingEngineScript && !document.querySelector('script[data-godot-teaser="engine"]')) {
+            if (!document.querySelector('script[data-godot-teaser="engine"]')) {
                 const engineScript = document.createElement('script')
                 engineScript.src = '/teaser/ResumeTeaser.js'
                 engineScript.async = true
                 engineScript.dataset.godotTeaser = 'engine'
 
                 engineScript.onload = () => {
-                    // Initialize Godot
-                    if (globalThis.initGodotTeaser) {
-                        globalThis.initGodotTeaser()
-                    }
+                    // Initialize Godot engine
+                    initGodot().catch((err) => {
+                        console.error('[GodotTeaser] Failed to initialize Godot:', err)
+                    })
                 }
 
                 document.body.appendChild(engineScript)
@@ -309,6 +300,12 @@ function GodotTeaser({ isPanelVisible = false }) {
         let hasLoaded = false
 
         if (heroVisible) {
+            // Check if TV is initially in view on page load
+            // If both Hero and TV are visible on mount, we should NOT load from the TV observer
+            // since we're waiting for typing to complete. Only use observer as fallback if user scrolls.
+            const tvRect = containerRef.current?.getBoundingClientRect()
+            const tvInitiallyInView = tvRect && tvRect.top < window.innerHeight && tvRect.bottom > 0
+
             // Hero is visible - wait for typing to complete OR hero scrolling out of view
             const handleTypingComplete = () => {
                 if (!hasLoaded) {
@@ -333,10 +330,12 @@ function GodotTeaser({ isPanelVisible = false }) {
 
             // Fallback: if TV container scrolls into view before typing completes, load godot engine immediately.
             // This prevents race condition where user scrolls to TV before Hero typing pause triggers load.
+            // However, skip this if TV was already in view on initial page load - in that case,
+            // respect the "wait for typing pause" condition and don't trigger on initial observer mount.
             const teserObserver = new IntersectionObserver(
                 (entries) => {
                     entries.forEach((entry) => {
-                        if (entry.isIntersecting && !hasLoaded) {
+                        if (entry.isIntersecting && !hasLoaded && !tvInitiallyInView) {
                             hasLoaded = true
                             loadGodotEngine()
                             cleanup()

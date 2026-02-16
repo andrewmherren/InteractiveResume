@@ -1,11 +1,14 @@
 // Hero typing carousel - rotating phrases displayed in the main hero section
 export const roles = [
-    "Architected for enterprise healthcare scale",
-    "Built systems that survived acquisition",
     "Full-stack pragmatist",
-    "AWS + healthcare compliance",
-    "From MVP to enterprise product"
+    "Built systems that survived acquisition",
+    "From MVP to enterprise healthcare",
+    "AWS + compliance at scale",
+    "I make complicated things simple"
 ]
+
+// Floating keywords animated in hero section background
+export const keywords = ['Systems', 'Architecture', 'Resilience', 'Scale', 'Pragmatic', 'Ownership']
 
 // Experience timeline - detailed career history with flip cards
 export const experiences = [
@@ -16,8 +19,7 @@ export const experiences = [
         duration: "2023 - Present",
         color: "from-amber-400 to-yellow-500",
         summary: "Contributed heavily to the integration of Xtract's allergy platform into ModMed post-acquisition. Maintained and extended Laravel/React features on AWS (ECS, RDS, CloudWatch, CodeBuild, Secrets Manager). Bridged legacy architecture with ModMed platform and compliance workflows while onboarding new engineers.",
-        example: "I found myself as the primary point of contact for all things technical. Between supporting the cloud team in transitioning services to ModMed's AWS account, helping the compliance team understand our processes, security praciteces, and where gaps might exist post transition, providing top level support for customer issues, and onboarding new engineers to the codebase I am constantly juggling multiple high priority tasks.",
-        quote: "[TBD]"
+        example: "I am the primary technical point of contact for the acquired system. I support cloud teams migrating services into ModMed's AWS, help compliance teams map security practices, and onboard new engineers into a legacy codebase. Most days involve juggling dev work, customer issues, and architectural decisions in parallel."
     },
     {
         id: 2,
@@ -26,8 +28,7 @@ export const experiences = [
         duration: "2015 - 2022",
         color: "from-yellow-500 to-orange-500",
         summary: "Designed and architected modular, HIPAA-compliant SaaS platform for enterprise healthcare scale. Built domain-specific state machines enabling customizable clinical workflows without code duplication. Established CI/CD pipelines supporting rapid iteration. Product acquired by Modernizing Medicine.",
-        example: "One impactful example was recognizing that our products greatest value, its rigid adherence to a predefined workflow, was also its biggest limitation. To address this, I deconstructed the workflow into the smallest functional units of work, creating a library of modular domain specific actions. I then designed a framework to orchestrate these actions into workflows defined by each client. This approach allowed us to rapidly tailor our solution to diverse client needs without duplicating code, significantly enhancing both flexibility and maintainability.",
-        quote: "[TBD]"
+        example: "Our product's biggest strength — a rigid predefined workflow — was also its biggest limitation. I decomposed the system into the smallest meaningful domain actions and built a composable framework to orchestrate them into client-defined workflows. This allowed us to support radically different clinical processes without forking code, dramatically improving flexibility while preserving maintainability and compliance."
     },
     {
         id: 3,
@@ -35,11 +36,18 @@ export const experiences = [
         company: "Xerox",
         duration: "2006 - 2015",
         color: "from-orange-500 to-amber-600",
-        summary: "Root cause analysis on flagship multifunction printer line. Diagnosed jamming issue affecting 21% of field returns and 33% of prototypes. Deployed on-site to Southeast Asia during critical line-down event with 80% production rejection.",
-        example: "One story that stands out was particularly challenging software failure that was occurring with great frequency across the population of machines but at very low frequency on any individual machine. I developed a custom arduino based serial data logger roughly the size of a key fob that recorded to an SD card. These devices were deployed to service teams and could be discretely installed on units with a high likely hood of failure. Ultimately the data collected from these devices provided the necessary insights for the software team to identify the root cause. Additionally the devices continued to be used for for other problems and product lines.",
-        quote: "\"As part of the missing jet project, I have had the opportunity to work closely with Andrew Herren. I have found him to have the qualities which we should proactively proliferate within our organization. Things like technical competence, work ethic, and attitude are but the foundation of this cutler that I personally value. Andrew also possesses things which I find to be rare and unique and include true comradery, passion, and selflessness to the team and the project. He works for Xerox and does things that help the team and the company AND he does not expect credit, but he deserves a lot.\" - Trevor Snyder (Principle Engineer)"
+        summary: "Spent nearly a decade diagnosing complex, low-reproducibility failures in large-scale electromechanical systems. Specialized in building custom diagnostics and investigative tooling to make invisible system behavior observable and debuggable.",
+        example: "A particularly difficult software failure occurred frequently across the fleet but rarely on any single machine. I built a tiny Arduino-based serial logger that recorded diagnostic data to an SD card and could be discreetly deployed in the field. The data from these devices gave the software team the visibility they needed to identify the root cause, and the tool was later reused across other product lines."
     },
 ]
+
+// Testimonial section - displayed between experience and education
+export const testimonial = {
+    text: "As part of the missing jet project, I have had the opportunity to work closely with Andrew Herren. I have found him to have the qualities which we should proactively proliferate within our organization. Things like technical competence, work ethic, and attitude are but the foundation of this culture that I personally value. Andrew also possesses things which I find to be rare and unique and include true camaraderie, passion, and selflessness to the team and the project. He works for Xerox and does things that help the team and the company AND he does not expect credit, but he deserves a lot.",
+    attribution: "Trevor Snyder",
+    title: "Principal Engineer",
+    company: "Xerox"
+}
 
 // Education section - degrees displayed at bottom of experience timeline
 export const education = [

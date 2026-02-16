@@ -2,9 +2,9 @@ import ResumeTimeline from './components/ResumeTimeline'
 import Footer from './components/Footer'
 import SplitHero from './components/SplitHero'
 import Hero from './components/Hero'
+import { keywords } from './data/resumeData'
 import './index.css'
 
-const keywords = ['AWS', 'React', 'Laravel', 'Systems', 'Scale', 'Pragmatic']
 function App() {
   return (
     <div className="min-h-screen gradient-bg text-slate-100">

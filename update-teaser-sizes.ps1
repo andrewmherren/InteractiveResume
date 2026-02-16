@@ -1,5 +1,5 @@
 # Update Godot File Sizes
-# Extracts file sizes from Export/ResumeTeaser.html and updates src/teaser/godot-loader.js
+# Extracts file sizes from Export/ResumeTeaser.html and updates src/utils/initGodot.js
 
 Write-Host "Updating Godot file sizes..." -ForegroundColor Cyan
 
@@ -21,24 +21,24 @@ if ($exportHtml -match 'const GODOT_CONFIG = ({.+?});') {
         
         Write-Host "  Found file sizes: .pck=$pckSize bytes, .wasm=$wasmSize bytes" -ForegroundColor Gray
         
-        # Update src/teaser/godot-loader.js
-        $loaderPath = "src/teaser/godot-loader.js"
-        $loaderContent = Get-Content -Path $loaderPath -Raw
+        # Update src/utils/initGodot.js
+        $initGodotPath = "src/utils/initGodot.js"
+        $initGodotContent = Get-Content -Path $initGodotPath -Raw
         
         # Replace the fileSizes object
         $newFileSizes = @"
-"fileSizes": {
-            "ResumeTeaser.pck": $pckSize,
-            "ResumeTeaser.wasm": $wasmSize,
-            "/teaser/ResumeTeaser.pck": $pckSize,
-            "/teaser/ResumeTeaser.wasm": $wasmSize
+fileSizes: {
+            'ResumeTeaser.pck': $pckSize,
+            'ResumeTeaser.wasm': $wasmSize,
+            '/teaser/ResumeTeaser.pck': $pckSize,
+            '/teaser/ResumeTeaser.wasm': $wasmSize
         }
 "@
         
-        $loaderContent = $loaderContent -replace '"fileSizes":\s*{[^}]+}', $newFileSizes
+        $initGodotContent = $initGodotContent -replace "fileSizes:\s*{[^}]+}", $newFileSizes
         
-        Set-Content -Path $loaderPath -Value $loaderContent -NoNewline
-        Write-Host "  Updated $loaderPath with new file sizes" -ForegroundColor Green
+        Set-Content -Path $initGodotPath -Value $initGodotContent -NoNewline
+        Write-Host "  Updated $initGodotPath with new file sizes" -ForegroundColor Green
     }
 } else {
     Write-Host "  Could not extract file sizes from Export/ResumeTeaser.html" -ForegroundColor Yellow

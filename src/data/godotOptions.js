@@ -5,7 +5,7 @@ export const GODOT_OPTIONS = [
         label: 'Architecture',
         title: 'Modular Workflow Architecture',
         summary:
-            'Rebuilt rigid clinical workflows into a composable system of domain actions so each client could tailor flows without duplicating code.',
+            'Rebuilt rigid clinical workflows into a composable system so each client could tailor behavior without forking code.',
         bullets: [
             'Created reusable action library for clinical steps',
             'Enabled per-client workflow assembly without forks',
@@ -22,7 +22,7 @@ export const GODOT_OPTIONS = [
         bullets: [
             'Bridged legacy systems with new platform standards',
             'Partnered with compliance and cloud teams',
-            'Kept releases steady during the transition'
+            'Mentored incoming ModMed engineers on legacy codebase while establishing team processes'
         ]
     },
     {
@@ -31,11 +31,11 @@ export const GODOT_OPTIONS = [
         label: 'Scale',
         title: 'Enterprise Healthcare Scale',
         summary:
-            'Designed systems to handle enterprise healthcare workloads with reliability, observability, and speed.',
+            'Designed systems to handle enterprise healthcare workloads reliably, iteratively, and at scale.',
         bullets: [
-            'AWS ECS + RDS architecture for reliability',
+            'Owned infrastructure development and served as technical escalation point for complex issues across platform, application, and operational systems',
             'Built CI/CD pipelines for rapid iteration',
-            'Focus on performance under real-world load'
+            'Balanced infrastructure simplicity with flexibility needed for diverse customer requirements'
         ]
     },
     {
@@ -46,9 +46,9 @@ export const GODOT_OPTIONS = [
         summary:
             'Aligned cloud systems and engineering practice to meet HIPAA and enterprise compliance requirements.',
         bullets: [
-            'Mapped data flows to compliance controls',
+            'Established audit logging for clinical data access to meet HIPAA requirements',
             'Coordinated with security and audit teams',
-            'Reduced operational risk without slowing delivery'
+            'Implemented role-based access controls aligned with healthcare compliance standards'
         ]
     },
     {
