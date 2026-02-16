@@ -7,6 +7,7 @@
     width: 100%;
     height: 100%;
     background-color: transparent;
+    touch-action: none;
 }
 
 #godot-canvas:focus {
@@ -28,7 +29,7 @@
 }
 
 #godot-status {
-    background-color: #242424;
+    background: transparent;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -37,6 +38,7 @@
 }
 
 #godot-status-splash {
+    display: none;
     max-height: 100%;
     max-width: 100%;
     margin: auto;
@@ -62,9 +64,32 @@
 }
 
 #godot-status-progress {
-    bottom: 10%;
-    width: 50%;
+    top: 50%;
+    width: min(48%, 288px);
+    height: 10px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: rgba(251, 191, 36, 0.2);
+    box-shadow: 0 0 12px rgba(251, 191, 36, 0.25);
     margin: 0 auto;
+    transform: translateY(-50%);
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+#godot-status-progress::-webkit-progress-bar {
+    background: rgba(251, 191, 36, 0.2);
+    border-radius: 999px;
+}
+
+#godot-status-progress::-webkit-progress-value {
+    background: linear-gradient(90deg, #fbbf24, #f59e0b, #d97706);
+    border-radius: 999px;
+}
+
+#godot-status-progress::-moz-progress-bar {
+    background: linear-gradient(90deg, #fbbf24, #f59e0b, #d97706);
+    border-radius: 999px;
 }
 
 #godot-status-notice {

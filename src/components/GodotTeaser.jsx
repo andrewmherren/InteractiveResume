@@ -99,18 +99,30 @@ function GodotTeaser({ isPanelVisible = false }) {
                 updateGodotMousePosition(lastMouseX, lastMouseY)
             }
 
+            const handleTouch = (event) => {
+                const touch = event.touches[0] || event.changedTouches[0]
+                if (!touch) return
+                lastMouseX = touch.clientX
+                lastMouseY = touch.clientY
+                updateGodotMousePosition(lastMouseX, lastMouseY)
+            }
+
             // Track scroll events to update mouse position relative to canvas
             const handleScroll = () => {
                 updateGodotMousePosition(lastMouseX, lastMouseY)
             }
 
             document.addEventListener('mousemove', handleMouseMove)
+            document.addEventListener('touchstart', handleTouch, { passive: true })
+            document.addEventListener('touchmove', handleTouch, { passive: true })
             document.addEventListener('scroll', handleScroll, true) // Use capture to catch all scroll events
             isTracking = true
 
             // Return cleanup function
             return () => {
                 document.removeEventListener('mousemove', handleMouseMove)
+                document.removeEventListener('touchstart', handleTouch)
+                document.removeEventListener('touchmove', handleTouch)
                 document.removeEventListener('scroll', handleScroll, true)
                 isTracking = false
             }

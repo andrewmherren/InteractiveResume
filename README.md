@@ -7,7 +7,7 @@ An interactive resume showcasing 18+ years of full-stack architecture and system
 ## Features
 
 - 🎬 **Animated Hero Section** - Engaging introduction with typing carousel
-- � **Godot Teaser** - Interactive 3D TV scene with clickable zones
+- **Godot Teaser** - Interactive 3D TV scene with clickable zones ([source](https://github.com/andrewmherren/ResumeTeaser))
 - 🎴 **Interactive Flip Cards** - Click to reveal detailed career stories
 - 🔧 **Technical Focus** - Emphasis on architecture, SaaS scale, and pragmatic engineering
 - 📱 **Responsive Design** - Works across mobile, tablet, and desktop
@@ -33,3 +33,7 @@ npm run update-teaser  # Update Godot teaser from Export folder
 ---
 
 **Built to stand out for early-stage startup teams seeking a pragmatic architect.**
+
+---
+
+See [LICENSE](LICENSE) for usage terms.

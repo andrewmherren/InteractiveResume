@@ -1,137 +1,66 @@
 # Terraform Deployment Guide
 
-This Terraform configuration deploys the Interactive Resume to AWS with HTTPS via CloudFront and S3.
+This configuration deploys your Interactive Resume to AWS at the root of andrewherren.com using CloudFront + S3.
 
 ## Prerequisites
 
-1. **AWS Account** with the `andrewherren.com` domain already registered in Route53
-2. **Terraform** installed (v1.0+)
-3. **AWS CLI** configured with appropriate credentials
-4. **Built site** - Run `npm run build` to generate the `dist/` directory
+- Terraform v1.0+
+- AWS CLI configured with your profile (`personal`)
+- Built site: `npm run build`
 
-## Resources Created
+## State Backend
 
-- **S3 Bucket** - Static file hosting (encrypted, versioned, non-public)
-- **CloudFront Distribution** - CDN with HTTPS, caching, and SPA routing
-- **ACM Certificate** - Free TLS certificate via AWS Certificate Manager
-- **Route53 DNS Records** - Points domain to CloudFront
-- **CloudFront Origin Access Identity** - Secure S3 access
+State location: `s3://tf.andrewherren.com/terraform/terraform.tfstate`
 
-## Deployment Steps
-
-### 1. Initialize Terraform
+If you are setting up a new environment, create the state bucket in `us-west-2`, enable versioning/encryption, block public access, then run:
 
 ```bash
-cd terraform
-terraform init
+AWS_PROFILE=personal terraform init -reconfigure
 ```
 
-### 2. Review the Plan
+## Deploy / Update
 
 ```bash
-terraform plan
-```
+# Apply infra changes
+AWS_PROFILE=personal terraform apply
 
-Verify all resources look correct (should show ~10 resources being created).
+# Upload the built site to the bucket root
+AWS_PROFILE=personal aws s3 sync ../dist/ s3://andrewherren.com --delete
 
-### 3. Apply Configuration
-
-```bash
-terraform apply
-```
-
-Confirm by typing `yes`. This takes ~5-10 minutes (CloudFront deployment is slower).
-
-### 4. Upload Site Files
-
-After Terraform completes, upload your built site:
-
-```bash
-aws s3 sync ../dist/ s3://$(terraform output -raw s3_bucket_name) --delete
-```
-
-### 5. Invalidate CloudFront Cache
-
-After uploading, invalidate CloudFront to ensure fresh content:
-
-```bash
-aws cloudfront create-invalidation \
-  --distribution-id $(terraform output -raw cloudfront_distribution_id) \
+# Invalidate CloudFront cache
+AWS_PROFILE=personal aws cloudfront create-invalidation \
+  --distribution-id $(AWS_PROFILE=personal terraform output -raw cloudfront_distribution_id) \
   --paths "/*"
 ```
 
-### 6. Verify
+## Verify
 
-Visit `https://andrewherren.com` - it should load your resume!
-
-## File Structure
-
-```
-terraform/
-├── provider.tf       # AWS provider configuration
-├── variables.tf      # Variable definitions
-├── main.tf          # Core resources (S3, CloudFront, ACM, Route53)
-├── outputs.tf       # Output values
-├── terraform.tfvars # Variables (domain name)
-└── README.md        # This file
-```
+- https://andrewherren.com
+- https://www.andrewherren.com
 
 ## Configuration
 
-Edit `terraform.tfvars` to customize:
-
 ```hcl
-domain_name = "andrewherren.com"  # Your domain (must exist in Route53)
-```
-
-## Updating the Site
-
-After making changes to your resume:
-
-1. Build: `npm run build`
-2. Sync: `aws s3 sync dist/ s3://YOUR-BUCKET-NAME --delete`
-3. Invalidate: `aws cloudfront create-invalidation --distribution-id YOUR-DIST-ID --paths "/*"`
-
-## State Management (Optional)
-
-To store Terraform state in S3 (recommended for production):
-
-1. Create an S3 bucket and DynamoDB table for locking
-2. Uncomment the `backend` block in `provider.tf`
-3. Update with your bucket/table names
-4. Run `terraform init` again
-
-## Cleanup
-
-To destroy all resources (WARNING: This deletes your site):
-
-```bash
-terraform destroy
+domain_name = "andrewherren.com"
+bucket_name = "andrewherren.com"
+s3_region = "us-west-2"
 ```
 
 ## Troubleshooting
 
-**Certificate validation fails:**
-- Ensure your domain exists in Route53
-- Verify Route53 records for DNS validation
+**"No valid credential sources found"**
+- Confirm the profile has keys: `AWS_PROFILE=personal aws sts get-caller-identity`
 
-**CloudFront returns 403 Forbidden:**
-- Check S3 bucket policy was created
-- Verify Origin Access Identity (OAI) was applied
+**"S3 bucket either doesn't exist or you don't have permission"**
+- Verify: `AWS_PROFILE=personal aws s3 ls s3://andrewherren.com/`
 
-**DNS not resolving:**
-- CloudFront can take 5-10 minutes to deploy fully
-- Check Route53 records point to CloudFront domain
+**CloudFront invalidation fails**
+- Confirm outputs: `AWS_PROFILE=personal terraform output`
 
-**404 errors on refresh:**
-- Verify custom error responses redirect to `index.html`
-- Check CloudFront default root object is `index.html`
+## Cleanup
 
-## Cost Estimates
+```bash
+AWS_PROFILE=personal terraform destroy
+```
 
-- **S3 Storage**: ~$0.023/GB/month (typically < $1/month for a resume site)
-- **CloudFront**: ~$0.085/GB (usually < $1/month for typical traffic)
-- **Route53**: $0.50/month for hosted zone
-- **ACM Certificate**: Free
-
-**Total: ~$1-2/month** depending on traffic.
+This deletes CloudFront, ACM, and Route53 records, but keeps the S3 bucket.

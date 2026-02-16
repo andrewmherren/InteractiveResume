@@ -4,6 +4,12 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
+variable "s3_region" {
+  description = "AWS region for the existing S3 bucket"
+  type        = string
+  default     = "us-west-2"
+}
+
 variable "environment" {
   description = "Environment name"
   type        = string
@@ -11,12 +17,12 @@ variable "environment" {
 }
 
 variable "domain_name" {
-  description = "Domain name for the resume site (must already exist in Route53)"
+  description = "Domain name for the site (e.g., andrewherren.com)"
   type        = string
 }
 
-variable "enable_www_redirect" {
-  description = "Enable redirect from www to non-www"
-  type        = bool
-  default     = true
+variable "bucket_name" {
+  description = "Existing S3 bucket name (e.g., andrewherren.com)"
+  type        = string
+  default     = "andrewherren.com"
 }

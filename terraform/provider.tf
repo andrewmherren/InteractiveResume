@@ -8,18 +8,32 @@ terraform {
     }
   }
 
-  # Uncomment below to use S3 backend for state management
-  # backend "s3" {
-  #   bucket         = "your-terraform-state-bucket"
-  #   key            = "interactive-resume/terraform.tfstate"
-  #   region         = "us-east-1"
-  #   encrypt        = true
-  #   dynamodb_table = "terraform-lock"
-  # }
+  # S3 backend for state management
+  # The state is stored in the dedicated tf.andrewherren.com bucket under /terraform/terraform.tfstate
+  # This is safe for static site infrastructure with no sensitive data
+  backend "s3" {
+    bucket         = "tf.andrewherren.com"
+    key            = "terraform/terraform.tfstate"
+    region         = "us-west-2"
+    encrypt        = true
+  }
 }
 
 provider "aws" {
   region = var.aws_region
+
+  default_tags {
+    tags = {
+      Project     = "Interactive Resume"
+      Environment = var.environment
+      ManagedBy   = "Terraform"
+    }
+  }
+}
+
+provider "aws" {
+  alias  = "s3"
+  region = var.s3_region
 
   default_tags {
     tags = {

@@ -97,7 +97,7 @@ const Hero = () => {
                     </p>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4 mb-10 w-full max-w-2xl mx-auto px-12 md:px-18">
+                <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-10 w-full max-w-2xl mx-auto px-3 sm:px-8 md:px-18">
                     <button
                         className="glass rounded-xl p-4 text-center hover-lift cursor-pointer"
                         onClick={() => document.getElementById('experience').scrollIntoView({ behavior: 'smooth' })}
