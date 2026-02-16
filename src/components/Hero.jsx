@@ -103,7 +103,10 @@ const Hero = () => {
                         onClick={() => document.getElementById('experience').scrollIntoView({ behavior: 'smooth' })}
                         aria-label="View experience section - 18+ years of experience"
                     >
-                        <div className="text-3xl md:text-4xl font-bold gradient-text">18+</div>
+                        <div className="text-3xl md:text-4xl font-bold">
+                            <span className="gradient-text">18</span>
+                            <span className="hero-plus ml-0.5 align-top text-[0.85em] font-black">+</span>
+                        </div>
                         <div className="text-xs md:text-sm text-slate-400">Years Experience</div>
                     </button>
                     <button

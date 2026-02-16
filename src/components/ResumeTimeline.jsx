@@ -132,7 +132,7 @@ const ResumeTimeline = () => {
                                             </div>
                                         </div>
                                         {/* Navigation anchored below card */}
-                                        <div className="absolute left-0 right-0 top-full pt-3 flex items-center text-slate-400 text-sm">
+                                        <div className="timeline-nav absolute left-0 right-0 top-full pt-3 flex items-center text-slate-400 text-sm">
                                             {flipped[exp.id] ? (
                                                 <>
                                                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
