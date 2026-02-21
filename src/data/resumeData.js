@@ -19,7 +19,7 @@ export const experiences = [
         duration: "2023 - Present",
         color: "from-amber-400 to-yellow-500",
         summary: "Contributed heavily to the integration of Xtract's allergy platform into ModMed post-acquisition. Maintained and extended Laravel/React features on AWS (ECS, RDS, CloudWatch, CodeBuild, Secrets Manager). Bridged legacy architecture with ModMed platform and compliance workflows while onboarding new engineers.",
-        example: "I am the primary technical point of contact for the acquired system. I support cloud teams migrating services into ModMed's AWS, help compliance teams map security practices, and onboard new engineers into a legacy codebase. Most days involve juggling dev work, customer issues, and architectural decisions in parallel."
+        example: "I am the primary technical point of contact for the acquired system. I support cloud teams migrating services into ModMed's AWS, help compliance teams map security practices, and onboard new engineers into a legacy codebase. Most days involve interleaving dev work, customer issues, and architectural decisions in parallel."
     },
     {
         id: 2,

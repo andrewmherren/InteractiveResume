@@ -19,9 +19,9 @@ export async function initGodot() {
         executable: basePath,
         experimentalVK: false,
         fileSizes: {
-            'ResumeTeaser.pck': 16167412,
+            'ResumeTeaser.pck': 16167556,
             'ResumeTeaser.wasm': 37686550,
-            '/teaser/ResumeTeaser.pck': 16167412,
+            '/teaser/ResumeTeaser.pck': 16167556,
             '/teaser/ResumeTeaser.wasm': 37686550
         },
         focusCanvas: false,

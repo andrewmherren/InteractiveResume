@@ -73,17 +73,23 @@ const Hero = () => {
         <div className="relative z-10 w-full max-w-3xl mx-auto">
             <div className="stagger-children">
                 <div className="mb-8 flex justify-center">
-                    <div className="w-28 h-28 md:w-36 md:h-36 rounded-full overflow-hidden border-4 border-amber-500/50 glow">
-                        <img
-                            src="/photo.jpg"
-                            alt="Profile"
-                            className="w-full h-full object-cover object-[-2px_center] scale-103" // slight scale and zoom to tailor image
-                            onError={(e) => {
-                                e.target.style.display = 'none';
-                                e.target.parentElement.innerHTML = '<div class="w-full h-full bg-gradient-to-br from-amber-600 to-orange-600 flex items-center justify-center text-4xl font-bold">AH</div>';
-                            }}
-                        />
-                    </div>
+                    <button
+                        className="glow hero-picture-hover cursor-pointer rounded-full"
+                        onClick={() => document.getElementById('godot-teaser').scrollIntoView({ behavior: 'smooth' })}
+                        aria-label="Scroll to interactive Godot teaser"
+                    >
+                        <div className="w-28 h-28 md:w-36 md:h-36 rounded-full overflow-hidden border-4 border-amber-500/50">
+                            <img
+                                src="/photo.jpg"
+                                alt="Profile"
+                                className="w-full h-full object-cover object-[-2px_center] scale-103" // slight scale and zoom to tailor image
+                                onError={(e) => {
+                                    e.target.style.display = 'none';
+                                    e.target.parentElement.innerHTML = '<div class="w-full h-full bg-gradient-to-br from-amber-600 to-orange-600 flex items-center justify-center text-4xl font-bold">AH</div>';
+                                }}
+                            />
+                        </div>
+                    </button>
                 </div>
 
                 <h1 className="text-5xl md:text-7xl font-bold text-center mb-4">
@@ -98,33 +104,21 @@ const Hero = () => {
                 </div>
 
                 <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-10 w-full max-w-2xl mx-auto px-3 sm:px-8 md:px-18">
-                    <button
-                        className="glass rounded-xl p-4 text-center hover-lift cursor-pointer"
-                        onClick={() => document.getElementById('experience').scrollIntoView({ behavior: 'smooth' })}
-                        aria-label="View experience section - 18+ years of experience"
-                    >
+                    <div className="glass rounded-xl p-4 text-center">
                         <div className="text-3xl md:text-4xl font-bold">
                             <span className="gradient-text">18</span>
                             <span className="hero-plus ml-0.5 align-top text-[0.85em] font-black">+</span>
                         </div>
                         <div className="text-xs md:text-sm text-slate-400">Years Experience</div>
-                    </button>
-                    <button
-                        className="glass rounded-xl p-4 text-center hover-lift cursor-pointer"
-                        onClick={() => document.getElementById('experience').scrollIntoView({ behavior: 'smooth' })}
-                        aria-label="View experience section - 1 successful exit"
-                    >
+                    </div>
+                    <div className="glass rounded-xl p-4 text-center">
                         <div className="text-3xl md:text-4xl font-bold gradient-text">1</div>
                         <div className="text-xs md:text-sm text-slate-400">Successful Exit</div>
-                    </button>
-                    <button
-                        className="glass rounded-xl p-4 text-center hover-lift cursor-pointer"
-                        onClick={() => document.getElementById('experience').scrollIntoView({ behavior: 'smooth' })}
-                        aria-label="View experience section - 3 engineering degrees"
-                    >
+                    </div>
+                    <div className="glass rounded-xl p-4 text-center">
                         <div className="text-3xl md:text-4xl font-bold gradient-text">3</div>
                         <div className="text-xs md:text-sm text-slate-400">Engineering Degrees</div>
-                    </button>
+                    </div>
                 </div>
 
                 <div className="flex gap-6 justify-center">

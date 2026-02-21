@@ -31,7 +31,7 @@ const SplitHero = () => {
     }, [handleGenericAction])
 
     return (
-        <section className="tv-hero-section relative py-6 md:py-10">
+        <section id="godot-teaser" className="tv-hero-section relative py-6 md:py-10">
             <div className="max-w-7xl mx-auto px-4">
                 <div className="tv-hero-layout">
                     <div

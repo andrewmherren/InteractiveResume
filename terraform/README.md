@@ -33,6 +33,25 @@ AWS_PROFILE=personal aws cloudfront create-invalidation \
   --paths "/*"
 ```
 
+## App Updates (Content Only)
+
+When you make changes to the app and want to deploy them without modifying infrastructure:
+
+```bash
+# 1. Build the app
+npm run build
+
+# 2. Upload to S3 (from the terraform directory)
+AWS_PROFILE=personal aws s3 sync ../dist/ s3://andrewherren.com --delete
+
+# 3. Invalidate CloudFront cache to serve fresh content
+AWS_PROFILE=personal aws cloudfront create-invalidation \
+  --distribution-id $(AWS_PROFILE=personal terraform output -raw cloudfront_distribution_id) \
+  --paths "/*"
+```
+
+The `--delete` flag removes files from S3 that no longer exist in the build. The CloudFront invalidation typically completes in 1-2 minutes.
+
 ## Verify
 
 - https://andrewherren.com
