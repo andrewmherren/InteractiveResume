@@ -32,7 +32,7 @@ npm run update-teaser  # Update Godot teaser from Export folder
 
 ---
 
-**Built to stand out for early-stage startup teams seeking a pragmatic architect.**
+**Built for small teams who like building hard things.**
 
 ---
 
